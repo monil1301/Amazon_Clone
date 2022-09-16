@@ -1,6 +1,7 @@
 // Imports
 const express = require('express');
 const mongoose = require('mongoose'); 
+const adminRouter = require('./routes/admin');
 
 // Local Imports
 const authRouter = require('./routes/auth');
@@ -13,6 +14,7 @@ const DB = "mongodb+srv://Monil:QpOt8mXHmTtLHaym@cluster0.zyqfc.mongodb.net/?ret
 // Middleware
 app.use(express.json());
 app.use(authRouter);
+app.use(adminRouter);
 
 // Connect to MongoDB
 mongoose.connect(DB).then(() => {
