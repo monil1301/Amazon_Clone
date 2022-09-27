@@ -19,11 +19,37 @@ productRouter.get('/api/products', auth, async (req, res) => {
 productRouter.get('/api/products/search/:name', auth, async (req, res) => {
     try {
         const searchQuery = req.params.name;
-        console.log('search: ', searchQuery);
         const products = await Product.find({
             name: { $regex: searchQuery, $options: 'i' },
         });
         res.json(products);
+    } catch(e) {
+        console.log('error: ', e);
+        res.status(500).json({msg: e.message});
+    }
+});
+
+// rate product
+productRouter.post('/api/product/rate', auth, async (req, res) => {
+    try {
+        const {id, rating} = req.body;
+        let product = await Product.findById(id);
+
+        for(i=0; i < product.ratings.length; i++) {
+            if (product.ratings[i].userId == req.user) {
+                product.ratings.splice(i, 1);
+                break;
+            }
+        }
+
+        const ratingSchema = {
+            userId: req.user,
+            rating
+        }
+
+        product.ratings.push(ratingSchema);
+        product = await product.save();
+        res.json(product);
     } catch(e) {
         console.log('error: ', e);
         res.status(500).json({msg: e.message});
