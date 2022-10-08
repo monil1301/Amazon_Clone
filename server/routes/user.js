@@ -39,4 +39,27 @@ userRouter.post('/api/addToCart', auth, async (req, res) => {
     }
 });
 
+userRouter.delete('/api/removeFromCart/:id', auth, async (req, res) => {
+    try {
+        const { id } = req.params;
+        let user = await User.findById(req.user);
+
+        for(let i=0; i<user.cart.length; i++) {
+            if(user.cart[i].product._id.equals(id)) {
+                if (user.cart[i].quantity > 1) {
+                    user.cart[i].quantity -= 1;
+                } else {
+                    user.cart.splice(i, 1);
+                }
+            }
+        }
+
+        user = await user.save();
+        res.json(user);
+    } catch {
+        console.log('error: ', e);
+        res.status(500).json({msg: e.message});
+    }
+});
+
 module.exports = userRouter;
